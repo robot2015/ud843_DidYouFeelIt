@@ -15,8 +15,11 @@
  */
 package com.example.android.didyoufeelit;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -29,16 +32,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String USGS_REQUEST_URL =
             "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-05-02&minfelt=50&minmagnitude=5";
 
+    public static final String LOG_TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Perform the HTTP request for earthquake data and process the response.
-        Event earthquake = Utils.fetchEarthquakeData(USGS_REQUEST_URL);
-
-        // Update the information displayed to the user.
-        updateUi(earthquake);
+        // Get earthquake information in separate thread.
+        EarthquakeAsyncTask task = new EarthquakeAsyncTask();
+        task.execute(USGS_REQUEST_URL);
     }
 
     /**
@@ -53,5 +56,22 @@ public class MainActivity extends AppCompatActivity {
 
         TextView magnitudeTextView = (TextView) findViewById(R.id.perceived_magnitude);
         magnitudeTextView.setText(earthquake.perceivedStrength);
+    }
+
+    // Get earthquake information in separate thread.
+    private class EarthquakeAsyncTask extends AsyncTask<String, Void, Event> {
+
+        // Perform the HTTP request for earthquake data and process the response.
+        @Override
+        protected Event doInBackground(String... urls) {
+            Event earthquake = Utils.fetchEarthquakeData(urls[0]);
+            return earthquake;
+        }
+
+        // Update the information displayed to the user.
+        @Override
+        protected void onPostExecute(Event earthquake) {
+            updateUi(earthquake);
+        }
     }
 }

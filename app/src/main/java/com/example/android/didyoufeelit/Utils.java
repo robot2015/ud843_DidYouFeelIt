@@ -51,6 +51,7 @@ public final class Utils {
         String jsonResponse = null;
         try {
             jsonResponse = makeHttpRequest(url);
+            Log.v(LOG_TAG, "makeHttpRequest");
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error closing input stream", e);
         }
@@ -100,6 +101,7 @@ public final class Utils {
             if (urlConnection.getResponseCode() == 200) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
+                Log.v(LOG_TAG, "readFromStream");
             } else {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
             }
