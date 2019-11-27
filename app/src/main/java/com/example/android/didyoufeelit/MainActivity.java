@@ -18,8 +18,6 @@ package com.example.android.didyoufeelit;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -48,13 +46,13 @@ public class MainActivity extends AppCompatActivity {
      * Update the UI with the given earthquake information.
      */
     private void updateUi(Event earthquake) {
-        TextView titleTextView = (TextView) findViewById(R.id.title);
+        TextView titleTextView = findViewById(R.id.title);
         titleTextView.setText(earthquake.title);
 
-        TextView tsunamiTextView = (TextView) findViewById(R.id.number_of_people);
+        TextView tsunamiTextView = findViewById(R.id.number_of_people);
         tsunamiTextView.setText(getString(R.string.num_people_felt_it, earthquake.numOfPeople));
 
-        TextView magnitudeTextView = (TextView) findViewById(R.id.perceived_magnitude);
+        TextView magnitudeTextView = findViewById(R.id.perceived_magnitude);
         magnitudeTextView.setText(earthquake.perceivedStrength);
     }
 
@@ -64,14 +62,24 @@ public class MainActivity extends AppCompatActivity {
         // Perform the HTTP request for earthquake data and process the response.
         @Override
         protected Event doInBackground(String... urls) {
-            Event earthquake = Utils.fetchEarthquakeData(urls[0]);
-            return earthquake;
+
+            // Check if data is valid.
+            if (urls.length < 1 || urls[0] == null) {
+                return null;
+            }
+
+            return Utils.fetchEarthquakeData(urls[0]);
         }
 
         // Update the information displayed to the user.
         @Override
-        protected void onPostExecute(Event earthquake) {
-            updateUi(earthquake);
+        protected void onPostExecute(Event result) {
+
+            if (result == null) {
+                return;
+            }
+
+            updateUi(result);
         }
     }
 }
